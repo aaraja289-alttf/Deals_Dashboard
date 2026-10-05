@@ -5,7 +5,7 @@ st.set_page_config(page_title="Deals Hub", layout="wide")
 
 # Yahan apna Dropbox ya direct download link paste karein
 # Dropbox link ke end mein ?dl=1 hona lazmi hai
-FILE_LINK = "https://drive.google.com/file/d/1vzCzVKzIxJaOHc6BcNziggmot8Q0AkNR/view?usp=drive_link"
+FILE_LINK = "https://drive.google.com/uc?export=download&id=1vzCzVKzIxJaOHc6BcNziggmot8QOAkNR"
 
 @st.cache_data
 def load_data(url):
