@@ -3,17 +3,22 @@ import pandas as pd
 
 st.set_page_config(page_title="Deals Hub", layout="wide")
 
-# Data load karne ka function
+# Yahan apna Dropbox ya direct download link paste karein
+# Dropbox link ke end mein ?dl=1 hona lazmi hai
+FILE_LINK = "https://drive.google.com/file/d/1vzCzVKzIxJaOHc6BcNziggmot8Q0AkNR/view?usp=drive_link"
+
 @st.cache_data
-def load_data():
+def load_data(url):
     try:
-        return pd.read_csv('deals.csv') # Yahan apne deals database ki CSV file ka path dein
-    except:
+        # Direct URL se CSV load karna
+        return pd.read_csv(url) 
+    except Exception as e:
+        st.error(f"Data load nahi ho saka. Link check karein: {e}")
         return pd.DataFrame()
 
-df = load_data()
+df = load_data(FILE_LINK)
 
-# Header aur Last Updated Text (Image ke mutabiq)
+# Header aur Last Updated Text
 col_h1, col_h2 = st.columns([3, 1])
 with col_h1:
     st.header("Deals Hub")
@@ -23,7 +28,7 @@ with col_h2:
 # Confidentiality Warning Banner
 st.warning("⚠️ Deals are confidential and can be published only on or after they are published on www.amazon.co.uk. Amazon Prime Big Deal Days dates are confidential and can be communicated only after 15 September 2026 at 06:00 BST. Deal information is subject to change.")
 
-# Export Deals button ko yellow colour dene ke liye custom CSS
+# Export Deals button CSS
 st.markdown("""
     <style>
     div.stDownloadButton > button:first-child {
@@ -55,19 +60,19 @@ with col6:
     on_storefront = st.button("On Your Storefront", use_container_width=True)
 with col7:
     if st.button("Clear filters", type="tertiary"):
-        pass # Reset filters ki backend logic yahan aayegi
+        pass
 with col8:
     sort_by = st.selectbox("Sort", ["Sort by Recommended", "Lowest Price YTD", "Discount %"], label_visibility="collapsed")
 with col9:
     st.download_button("Export deals", data="csv_data_here", file_name="exported_deals.csv", mime="text/csv", use_container_width=True)
 
-# Apki previous requirement ke mutabiq ASIN Search bar
+# ASIN Search bar
 st.write("")
 search_asin = st.text_input("🔍 Search by ASIN", placeholder="Exact ASIN yahan enter karein...")
 
 st.markdown("---")
 
-# Table Headers (Columns setup)
+# Table Headers
 h_col1, h_col2, h_col3, h_col4, h_col5 = st.columns([4, 2, 2, 2, 2])
 with h_col1:
     st.markdown("**Deal Information**")
@@ -82,12 +87,15 @@ with h_col5:
 
 st.divider()
 
-# Data filtering apply karna
+# Data filtering
 filtered_df = df.copy()
 if not filtered_df.empty and search_asin:
     filtered_df = filtered_df[filtered_df['asin'].str.contains(search_asin, case=False, na=False)]
 
-# Cards Generate Karna
+if not filtered_df.empty and selected_cat != "Category (1)":
+    filtered_df = filtered_df[filtered_df['productCategory'] == selected_cat]
+
+# Cards Generation
 if not filtered_df.empty:
     for index, row in filtered_df.iterrows():
         c1, c2, c3, c4, c5 = st.columns([4, 2, 2, 2, 2])
@@ -117,4 +125,4 @@ if not filtered_df.empty:
             
         st.divider()
 else:
-    st.info("No deals match your filters. ASIN check karein ya apne database logs verify karein.")
+    st.info("No deals match your filters. ASIN check karein ya URL verify karein.")
